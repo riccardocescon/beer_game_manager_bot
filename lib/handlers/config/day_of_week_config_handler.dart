@@ -8,7 +8,7 @@ void _setPollDayOfWeek(TeleDart teleDart) async {
 
   _currentConfigOption = _ConfigOption.pollDayOfWeek;
 
-  final currentDayOfWeek = BotConfig.instance.dayOfWeekToStartPoll;
+  final currentDayOfWeek = Bot.instance.config.dayOfWeekToStartPoll;
 
   await _updateMessage(
     teleDart,
@@ -83,7 +83,7 @@ void _setPollDayOfWeekValue(
   final selectedDayOfWeek = date_time_utils.DaysOfWeek.values
       .firstWhere((element) => element.value == dayOfWeek);
 
-  BotConfig.instance.dayOfWeekToStartPoll = selectedDayOfWeek;
+  Bot.instance.config.dayOfWeekToStartPoll = selectedDayOfWeek;
 
   await _currentConfigMessage!.reply(
     'Poll day of week set to ${selectedDayOfWeek.name}',

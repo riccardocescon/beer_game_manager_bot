@@ -1,6 +1,8 @@
 part of '../../beer_game_manager_bot.dart';
 
 //#region Vars
+bool _botRunning = false;
+Timer? _remainingPollTimeTimer;
 ScheduledPoll? _currentPoll;
 Duration? get _remeainingPollTime {
   if (_currentPoll == null) {
@@ -15,7 +17,63 @@ Duration? get _remeainingPollTime {
 
 //#region API
 
-void _handlePoll(TeleDart teledart, TeleDartMessage message) async {
+void _autoHandlePoll(TeleDart teledart, TeleDartMessage message) async {
+  if (_botRunning) {
+    final botMessage = await message.reply('Bot already running');
+    await teledart.deleteMessage(
+      message.chat.id,
+      message.messageId,
+    );
+    teledart.deleteMessage(
+      botMessage.chat.id,
+      botMessage.messageId,
+    );
+
+    return;
+  }
+
+  _botRunning = true;
+  while (_botRunning) {
+    final now = DateTime.now();
+    final weekDayToStartPoll = Bot.instance.config.dayOfWeekToStartPoll.value;
+    final currentWeekDay = now.weekday;
+    final remainingDays = (currentWeekDay + weekDayToStartPoll) % 7;
+    final nowLaunch = now.copyWith(
+      hour: 12,
+      minute: 0,
+      second: 0,
+    );
+    final requestPollDateTime = nowLaunch.add(Duration(days: remainingDays));
+
+    final nextPollFormatted = DateFormat('dd/MM/yyyy HH:mm').format(
+      requestPollDateTime,
+    );
+    message.reply('Next poll will start on: $nextPollFormatted');
+
+    _remainingPollTimeTimer = Timer(
+      requestPollDateTime.difference(now),
+      () async {
+        await _handlePoll(teledart, message);
+        _killTimer();
+      },
+    );
+
+    while (_remainingPollTimeTimer != null) {
+      await Future.delayed(Duration(seconds: 1));
+    }
+  }
+}
+
+void _killTimer() {
+  _remainingPollTimeTimer?.cancel();
+  _remainingPollTimeTimer = null;
+}
+
+void _restartAutoHandlePoll() {
+  _killTimer();
+}
+
+Future<void> _handlePoll(TeleDart teledart, TeleDartMessage message) async {
   if (_currentPoll != null) {
     final alreadyRunning =
         await message.reply('There is a Poll already running, daaaaahhhhh');
@@ -59,7 +117,7 @@ Future<void> _startPoll(
     ),
   );
 
-  final deadline = DateTime.now().add(BotConfig.instance.pollDuration);
+  final deadline = DateTime.now().add(Bot.instance.config.pollDuration);
   _currentPoll = ScheduledPoll(
     poll.messageId.toString(),
     deadline,

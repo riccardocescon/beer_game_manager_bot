@@ -6,11 +6,6 @@ class BotConfig {
   date_time_utils.DaysOfWeek _dayOfWeekToStartPoll =
       date_time_utils.DaysOfWeek.monday;
 
-  BotConfig._();
-
-  static final BotConfig _instance = BotConfig._();
-  static BotConfig get instance => _instance;
-
   String get formattedPollDuration {
     final hours =
         _pollDuration.inHours.remainder(60).toString().padLeft(2, '0');

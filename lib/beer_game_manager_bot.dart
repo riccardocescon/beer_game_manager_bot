@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'dart:core';
+import 'package:beer_game_manager_bot/entities/bot.dart';
 import 'package:beer_game_manager_bot/entities/scheduled_poll.dart';
 import 'package:beer_game_manager_bot/utils/all_games.dart' as games_util;
 import 'package:beer_game_manager_bot/utils/commands.dart';
@@ -45,12 +49,24 @@ Future<void> commandStreamer(TeleDart teledart) async {
   await for (final message in messageStream) {
     if (_configModeEnabled) return;
     print('Received command: ${message.text}');
+    if (message.text == '/start') {
+      _autoHandlePoll(teledart, message);
+      continue;
+    }
+
     if (message.text == '/manage') {
       _handlePoll(teledart, message);
-    } else if (message.text == '/info') {
+      continue;
+    }
+
+    if (message.text == '/info') {
       _printBotConfigInfo(teledart, message);
-    } else if (message.text == '/config') {
+      continue;
+    }
+
+    if (message.text == '/config') {
       _configHandler(teledart, message);
+      continue;
     }
   }
 }
@@ -78,8 +94,9 @@ Future<void> _printBotConfigInfo(
   TeleDart teleDart,
   TeleDartMessage message,
 ) async {
-  final pollDuration = BotConfig.instance.formattedPollDuration;
-  final pollDayOfWeek = BotConfig.instance.dayOfWeekToStartPoll.name;
+  final config = Bot.instance.config;
+  final pollDuration = config.formattedPollDuration;
+  final pollDayOfWeek = config.dayOfWeekToStartPoll.name;
   final text = 'Bot configuration:\n'
       'Poll duration: $pollDuration\n'
       'Poll day of week: $pollDayOfWeek';

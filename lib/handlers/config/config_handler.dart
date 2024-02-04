@@ -113,6 +113,10 @@ void _exitConfigMode(TeleDart teleDart) {
   _currentConfigMessage = null;
   _inlineMessage = null;
   _configModeEnabled = false;
+
+  // Restart the auto handle poll
+  // with the new configuration
+  _restartAutoHandlePoll();
 }
 
 Future<void> _updateMessage(

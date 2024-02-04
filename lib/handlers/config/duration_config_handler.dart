@@ -10,7 +10,7 @@ void _setPollDuration(TeleDart teleDart) async {
 
   await _updateMessage(
     teleDart,
-    'How long should the poll last? (HH:mm:ss)\nCurrenlty: ${BotConfig.instance.formattedPollDuration}',
+    'How long should the poll last? (HH:mm:ss)\nCurrenlty: ${Bot.instance.config.formattedPollDuration}',
     replyMarkup: InlineKeyboardMarkup(inlineKeyboard: [
       [
         InlineKeyboardButton(
@@ -50,7 +50,7 @@ void _setPollDurationValue(TeleDart teleDart, Message message) async {
 
   final duration = Duration(hours: hours, minutes: minutes, seconds: seconds);
 
-  BotConfig.instance.pollDuration = duration;
+  Bot.instance.config.pollDuration = duration;
 
   await _currentConfigMessage!.reply('Poll duration set to $text');
 
