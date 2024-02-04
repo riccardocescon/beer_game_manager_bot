@@ -1,6 +1,10 @@
+import 'package:beer_game_manager_bot/utils/date_time_utils.dart'
+    as date_time_utils;
+
 class BotConfig {
   Duration _pollDuration = Duration(seconds: 10);
-  int _dayOfWeekToStartPoll = 1;
+  date_time_utils.DaysOfWeek _dayOfWeekToStartPoll =
+      date_time_utils.DaysOfWeek.monday;
 
   BotConfig._();
 
@@ -19,13 +23,13 @@ class BotConfig {
   }
 
   Duration get pollDuration => _pollDuration;
-  int get dayOfWeekToStartPoll => _dayOfWeekToStartPoll;
+  date_time_utils.DaysOfWeek get dayOfWeekToStartPoll => _dayOfWeekToStartPoll;
 
   set pollDuration(Duration value) {
     _pollDuration = value;
   }
 
-  set dayOfWeekToStartPoll(int value) {
+  set dayOfWeekToStartPoll(date_time_utils.DaysOfWeek value) {
     _dayOfWeekToStartPoll = value;
   }
 }

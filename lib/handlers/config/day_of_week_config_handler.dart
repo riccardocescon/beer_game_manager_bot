@@ -3,25 +3,12 @@ part of '../../beer_game_manager_bot.dart';
 String get _pollDayOfWeekFormatError =>
     'Invalid day of week format, please select one of the given options.';
 
-Map<String, String> _daysOfWeek = {
-  '1': 'Monday',
-  '2': 'Tuesday',
-  '3': 'Wednesday',
-  '4': 'Thursday',
-  '5': 'Friday',
-  '6': 'Saturday',
-  '7': 'Sunday',
-};
-
 void _setPollDayOfWeek(TeleDart teleDart) async {
   if (!_configModeEnabled) return;
 
   _currentConfigOption = _ConfigOption.pollDayOfWeek;
 
-  final currentDayOfWeek = _daysOfWeek.entries
-      .firstWhere((element) =>
-          element.key == BotConfig.instance.dayOfWeekToStartPoll.toString())
-      .value;
+  final currentDayOfWeek = BotConfig.instance.dayOfWeekToStartPoll;
 
   await _updateMessage(
     teleDart,
@@ -30,38 +17,38 @@ void _setPollDayOfWeek(TeleDart teleDart) async {
       inlineKeyboard: [
         [
           InlineKeyboardButton(
-            text: _daysOfWeek.entries.elementAt(0).value,
-            callbackData: _daysOfWeek.entries.elementAt(0).key,
+            text: date_time_utils.DaysOfWeek.monday.name,
+            callbackData: date_time_utils.DaysOfWeek.monday.value.toString(),
           ),
           InlineKeyboardButton(
-            text: _daysOfWeek.entries.elementAt(1).value,
-            callbackData: _daysOfWeek.entries.elementAt(1).key,
+            text: date_time_utils.DaysOfWeek.tuesday.name,
+            callbackData: date_time_utils.DaysOfWeek.tuesday.value.toString(),
           )
         ],
         [
           InlineKeyboardButton(
-            text: _daysOfWeek.entries.elementAt(2).value,
-            callbackData: _daysOfWeek.entries.elementAt(2).key,
+            text: date_time_utils.DaysOfWeek.wednesday.name,
+            callbackData: date_time_utils.DaysOfWeek.wednesday.value.toString(),
           ),
           InlineKeyboardButton(
-            text: _daysOfWeek.entries.elementAt(3).value,
-            callbackData: _daysOfWeek.entries.elementAt(3).key,
+            text: date_time_utils.DaysOfWeek.thursday.name,
+            callbackData: date_time_utils.DaysOfWeek.thursday.value.toString(),
           )
         ],
         [
           InlineKeyboardButton(
-            text: _daysOfWeek.entries.elementAt(4).value,
-            callbackData: _daysOfWeek.entries.elementAt(4).key,
+            text: date_time_utils.DaysOfWeek.friday.name,
+            callbackData: date_time_utils.DaysOfWeek.friday.value.toString(),
           ),
           InlineKeyboardButton(
-            text: _daysOfWeek.entries.elementAt(5).value,
-            callbackData: _daysOfWeek.entries.elementAt(5).key,
+            text: date_time_utils.DaysOfWeek.saturday.name,
+            callbackData: date_time_utils.DaysOfWeek.saturday.value.toString(),
           )
         ],
         [
           InlineKeyboardButton(
-            text: _daysOfWeek.entries.elementAt(6).value,
-            callbackData: _daysOfWeek.entries.elementAt(6).key,
+            text: date_time_utils.DaysOfWeek.sunday.name,
+            callbackData: date_time_utils.DaysOfWeek.sunday.value.toString(),
           )
         ],
         [
@@ -93,12 +80,13 @@ void _setPollDayOfWeekValue(
     return;
   }
 
-  BotConfig.instance.dayOfWeekToStartPoll = dayOfWeek;
+  final selectedDayOfWeek = date_time_utils.DaysOfWeek.values
+      .firstWhere((element) => element.value == dayOfWeek);
 
-  final stringDayOfWeek =
-      _daysOfWeek.entries.firstWhere((element) => element.key == text).value;
+  BotConfig.instance.dayOfWeekToStartPoll = selectedDayOfWeek;
+
   await _currentConfigMessage!.reply(
-    'Poll day of week set to $stringDayOfWeek',
+    'Poll day of week set to ${selectedDayOfWeek.name}',
   );
 
   teleDart.deleteMessage(

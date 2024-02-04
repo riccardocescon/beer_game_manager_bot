@@ -1,6 +1,8 @@
 import 'package:beer_game_manager_bot/entities/scheduled_poll.dart';
 import 'package:beer_game_manager_bot/utils/all_games.dart' as games_util;
 import 'package:beer_game_manager_bot/utils/commands.dart';
+import 'package:beer_game_manager_bot/utils/date_time_utils.dart'
+    as date_time_utils;
 import 'package:intl/intl.dart';
 import 'package:teledart/model.dart';
 import 'package:teledart/teledart.dart';
@@ -46,7 +48,7 @@ Future<void> commandStreamer(TeleDart teledart) async {
     if (message.text == '/manage') {
       _handlePoll(teledart, message);
     } else if (message.text == '/info') {
-      _printRemainingPollTime(teledart);
+      _printBotConfigInfo(teledart, message);
     } else if (message.text == '/config') {
       _configHandler(teledart, message);
     }
@@ -70,4 +72,16 @@ Future<void> callbackQueryStreamer(TeleDart teleDart) async {
       _updateRemainingPollTime(teleDart);
     }
   }
+}
+
+Future<void> _printBotConfigInfo(
+  TeleDart teleDart,
+  TeleDartMessage message,
+) async {
+  final pollDuration = BotConfig.instance.formattedPollDuration;
+  final pollDayOfWeek = BotConfig.instance.dayOfWeekToStartPoll.name;
+  final text = 'Bot configuration:\n'
+      'Poll duration: $pollDuration\n'
+      'Poll day of week: $pollDayOfWeek';
+  await message.reply(text);
 }
