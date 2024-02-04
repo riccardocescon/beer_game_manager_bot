@@ -1,11 +1,8 @@
-part of '../beer_game_manager_bot.dart';
+part of '../../beer_game_manager_bot.dart';
 
 bool _configModeEnabled = false;
 TeleDartMessage? _currentConfigMessage;
 Message? _inlineMessage;
-
-String get _pollDurationFormatError =>
-    'Invalid duration format, please use HH:mm:ss format.';
 
 enum _ConfigOption {
   none,
@@ -21,8 +18,15 @@ void _handleConfigMessage(
   required TeleDartCallbackQuery? callbackData,
   required Message? message,
 }) {
-  if (_currentConfigOption == _ConfigOption.pollDuration) {
+  final isPollDuration = _currentConfigOption == _ConfigOption.pollDuration;
+  if (isPollDuration) {
     _setPollDurationValue(teleDart, message!);
+    return;
+  }
+
+  final isPollDayOfWeek = _currentConfigOption == _ConfigOption.pollDayOfWeek;
+  if (isPollDayOfWeek) {
+    _setPollDayOfWeekValue(teleDart, callbackData!);
     return;
   }
 
@@ -88,81 +92,26 @@ void _configHandler(
   }
 }
 
-void _setPollDuration(TeleDart teleDart) async {
-  if (!_configModeEnabled || _currentConfigMessage == null) return;
-
-  _currentConfigOption = _ConfigOption.pollDuration;
-
-  await _updateMessage(
-    teleDart,
-    'How long should the poll last? (HH:mm:ss)',
-  );
-}
-
-void _setPollDurationValue(TeleDart teleDart, Message message) async {
-  if (!_configModeEnabled || _currentConfigMessage == null) return;
-
-  final text = message.text;
-  if (text == null) {
-    await _currentConfigMessage!.reply(_pollDurationFormatError);
-    return;
-  }
-  final hours = int.tryParse(text.split(':')[0]);
-  if (hours == null || hours < 0) {
-    await _currentConfigMessage!.reply(_pollDurationFormatError);
-    return;
-  }
-
-  final minutes = int.tryParse(text.split(':')[1]);
-  if (minutes == null || minutes < 0) {
-    await _currentConfigMessage!.reply(_pollDurationFormatError);
-    return;
-  }
-
-  final seconds = int.tryParse(text.split(':')[2]);
-  if (seconds == null || seconds < 0) {
-    await _currentConfigMessage!.reply(_pollDurationFormatError);
-    return;
-  }
-
-  final duration = Duration(hours: hours, minutes: minutes, seconds: seconds);
-
-  BotConfig.instance.pollDuration = duration;
-
-  await _currentConfigMessage!.reply('Poll duration set to $text');
-
-  teleDart.deleteMessage(
-    message.chat.id,
-    message.messageId,
-  );
-
+void _exitConfigMode(TeleDart teleDart) {
   teleDart.deleteMessage(
     _inlineMessage!.chat.id,
     _inlineMessage!.messageId,
   );
-
-  _configHandler(
-    teleDart,
-    _currentConfigMessage!,
-  );
-}
-
-void _setPollDayOfWeek(TeleDart teleDart) async {
-  if (!_configModeEnabled) return;
-  // await message.reply(
-  //   'Enter the new day of week to start the poll',
-  //   replyMarkup: ForceReply(),
-  // );
-}
-
-void _exitConfigMode(TeleDart teleDart) {
+  _currentConfigMessage?.reply('Exited configuration mode');
+  _currentConfigMessage = null;
+  _inlineMessage = null;
   _configModeEnabled = false;
 }
 
-Future<void> _updateMessage(TeleDart teleDart, String message) async {
+Future<void> _updateMessage(
+  TeleDart teleDart,
+  String message, {
+  InlineKeyboardMarkup? replyMarkup,
+}) async {
   await teleDart.editMessageText(
     message,
     chatId: _inlineMessage!.chat.id,
     messageId: _inlineMessage!.messageId,
+    replyMarkup: replyMarkup,
   );
 }

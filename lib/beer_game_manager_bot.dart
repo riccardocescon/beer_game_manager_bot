@@ -6,9 +6,12 @@ import 'package:teledart/teledart.dart';
 
 import 'config/bot_config.dart';
 
-part 'handlers/poll_handler.dart';
-part 'handlers/count_down_handler.dart';
-part 'handlers/config_handler.dart';
+part 'handlers/poll/poll_handler.dart';
+part 'handlers/poll/count_down_handler.dart';
+
+part 'handlers/config/config_handler.dart';
+part 'handlers/config/duration_config_handler.dart';
+part 'handlers/config/day_of_week_config_handler.dart';
 
 Future<void> handlerBGMB(TeleDart teledart) async {
   final messageHandler = messageStreamer(teledart);
@@ -28,7 +31,7 @@ Future<void> messageStreamer(TeleDart teledart) async {
         callbackData: null,
         message: message,
       );
-      return;
+      continue;
     }
   }
 }
@@ -37,6 +40,7 @@ Future<void> commandStreamer(TeleDart teledart) async {
   final messageStream = teledart.onCommand();
 
   await for (final message in messageStream) {
+    if (_configModeEnabled) return;
     print('Received command: ${message.text}');
     if (message.text == '/manage') {
       _handlePoll(teledart, message);
@@ -58,7 +62,7 @@ Future<void> callbackQueryStreamer(TeleDart teleDart) async {
         callbackData: callbackQuery,
         message: null,
       );
-      return;
+      continue;
     }
 
     if (callbackQuery.data == 'info') {

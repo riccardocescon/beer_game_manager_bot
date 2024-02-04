@@ -1,4 +1,4 @@
-part of '../beer_game_manager_bot.dart';
+part of '../../beer_game_manager_bot.dart';
 
 //#region Vars
 ScheduledPoll? _currentPoll;
