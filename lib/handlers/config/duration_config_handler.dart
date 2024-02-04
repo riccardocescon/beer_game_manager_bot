@@ -15,7 +15,7 @@ void _setPollDuration(TeleDart teleDart) async {
       [
         InlineKeyboardButton(
           text: 'Cancel',
-          callbackData: 'cancel_config',
+          callbackData: Commands.exitConfigMode.value,
         ),
       ],
     ]),

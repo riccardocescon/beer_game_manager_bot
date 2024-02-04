@@ -18,7 +18,7 @@ void _handleConfigMessage(
   required TeleDartCallbackQuery? callbackData,
   required Message? message,
 }) {
-  if (callbackData?.data == 'cancel_config') {
+  if (callbackData?.data == Commands.cancelConfig.value) {
     teleDart.deleteMessage(
       callbackData!.message!.chat.id,
       callbackData.message!.messageId,
@@ -46,13 +46,13 @@ void _handleConfigMessage(
 }
 
 void _handleFirstRequest(TeleDart teleDart, String? data) {
-  if (data == 'poll_duration') {
+  if (data == Commands.pollDuration.value) {
     _setPollDuration(teleDart);
     return;
-  } else if (data == 'poll_day_of_week') {
+  } else if (data == Commands.pollDayOfWeek.value) {
     _setPollDayOfWeek(teleDart);
     return;
-  } else if (data == 'exit_config_mode') {
+  } else if (data == Commands.exitConfigMode.value) {
     _exitConfigMode(teleDart);
     return;
   }
@@ -75,15 +75,15 @@ void _configHandler(
       [
         InlineKeyboardButton(
           text: 'Poll Duration',
-          callbackData: 'poll_duration',
+          callbackData: Commands.pollDuration.value,
         ),
         InlineKeyboardButton(
           text: 'Poll Day of Week',
-          callbackData: 'poll_day_of_week',
+          callbackData: Commands.pollDayOfWeek.value,
         ),
         InlineKeyboardButton(
           text: 'Exit',
-          callbackData: 'exit_config_mode',
+          callbackData: Commands.exitConfigMode.value,
         ),
       ],
     ],
