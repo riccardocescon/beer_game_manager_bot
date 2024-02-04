@@ -73,6 +73,15 @@ void _restartAutoHandlePoll() {
   _killTimer();
 }
 
+void _killPoll(TeleDart teledart, TeleDartMessage message) {
+  _botRunning = false;
+  _killTimer();
+  _currentPoll = null;
+  message.reply(
+    'Auto Poll Killed.\n You can now start a poll manually with \'/manage\' or restart the auto poll with \'/start\' command',
+  );
+}
+
 Future<void> _handlePoll(TeleDart teledart, TeleDartMessage message) async {
   if (_currentPoll != null) {
     final alreadyRunning =

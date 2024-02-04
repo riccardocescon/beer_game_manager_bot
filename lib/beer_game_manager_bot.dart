@@ -11,8 +11,6 @@ import 'package:intl/intl.dart';
 import 'package:teledart/model.dart';
 import 'package:teledart/teledart.dart';
 
-import 'config/bot_config.dart';
-
 part 'handlers/poll/poll_handler.dart';
 part 'handlers/poll/count_down_handler.dart';
 
@@ -66,6 +64,11 @@ Future<void> commandStreamer(TeleDart teledart) async {
 
     if (message.text == '/config') {
       _configHandler(teledart, message);
+      continue;
+    }
+
+    if (message.text == '/kill') {
+      _killPoll(teledart, message);
       continue;
     }
   }
