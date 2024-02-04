@@ -18,6 +18,18 @@ void _handleConfigMessage(
   required TeleDartCallbackQuery? callbackData,
   required Message? message,
 }) {
+  if (callbackData?.data == 'cancel_config') {
+    teleDart.deleteMessage(
+      callbackData!.message!.chat.id,
+      callbackData.message!.messageId,
+    );
+    _currentConfigMessage!
+        .reply('Configuration mode cancelled')
+        .then((value) => _configHandler(teleDart, _currentConfigMessage!));
+
+    return;
+  }
+
   final isPollDuration = _currentConfigOption == _ConfigOption.pollDuration;
   if (isPollDuration) {
     _setPollDurationValue(teleDart, message!);

@@ -10,7 +10,15 @@ void _setPollDuration(TeleDart teleDart) async {
 
   await _updateMessage(
     teleDart,
-    'How long should the poll last? (HH:mm:ss)',
+    'How long should the poll last? (HH:mm:ss)\nCurrenlty: ${BotConfig.instance.formattedPollDuration}',
+    replyMarkup: InlineKeyboardMarkup(inlineKeyboard: [
+      [
+        InlineKeyboardButton(
+          text: 'Cancel',
+          callbackData: 'cancel_config',
+        ),
+      ],
+    ]),
   );
 }
 

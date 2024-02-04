@@ -18,9 +18,14 @@ void _setPollDayOfWeek(TeleDart teleDart) async {
 
   _currentConfigOption = _ConfigOption.pollDayOfWeek;
 
+  final currentDayOfWeek = _daysOfWeek.entries
+      .firstWhere((element) =>
+          element.key == BotConfig.instance.dayOfWeekToStartPoll.toString())
+      .value;
+
   await _updateMessage(
     teleDart,
-    'Which day of the week should the poll run?',
+    'Which day of the week should the poll run?\nCurrently: $currentDayOfWeek',
     replyMarkup: InlineKeyboardMarkup(
       inlineKeyboard: [
         [
@@ -57,6 +62,12 @@ void _setPollDayOfWeek(TeleDart teleDart) async {
           InlineKeyboardButton(
             text: _daysOfWeek.entries.elementAt(6).value,
             callbackData: _daysOfWeek.entries.elementAt(6).key,
+          )
+        ],
+        [
+          InlineKeyboardButton(
+            text: 'Cancel',
+            callbackData: 'cancel_config',
           )
         ],
       ],
