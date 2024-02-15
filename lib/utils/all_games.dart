@@ -1,5 +1,11 @@
 import 'package:beer_game_manager_bot/entities/game.dart';
 
+final _beerGames = <BeerGame>[];
+void addBeerGame(BeerGame game) => _beerGames.add(game);
+void resetBeerGames() => _beerGames.clear();
+
+List<BeerGame> get allBeerGames => _beerGames.toList();
+
 List<Game> get allGames => [
       Game(name: 'Unicorn Fever', minPlayers: 2, maxPlayers: 6),
       Game(name: 'Exploding kittens', minPlayers: 2, maxPlayers: 5),
@@ -31,8 +37,8 @@ List<Game> get allGames => [
       Game(name: 'Abalone', minPlayers: 2, maxPlayers: 2),
     ];
 
-List<Game> gamesForPlayers(int players) {
-  final games = allGames.toList();
+List<BeerGame> gamesForPlayers(int players) {
+  final games = allBeerGames.toList();
 
   // Remove games that are not suitable for the number of players
   games.removeWhere((element) =>

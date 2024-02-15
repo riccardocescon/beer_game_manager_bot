@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'dart:core';
+import 'package:beer_game_manager_bot/database/database.dart';
 import 'package:beer_game_manager_bot/entities/bot.dart';
 import 'package:beer_game_manager_bot/entities/scheduled_poll.dart';
 import 'package:beer_game_manager_bot/utils/hub_messages.dart';
@@ -23,6 +24,8 @@ part 'handlers/hub/hub_handler.dart';
 part 'handlers/mark/mark_handler.dart';
 part 'handlers/config/duration_config_handler.dart';
 part 'handlers/config/day_of_week_config_handler.dart';
+
+late String deleteDBCommand;
 
 Future<void> handlerBGMB(TeleDart teledart) async {
   final messageHandler = messageStreamer(teledart);
@@ -111,6 +114,9 @@ void _sendHubMessage(TeleDart teleDart, TeleDartMessage message) {
       keyboard: [
         [
           KeyboardButton(text: HubMessage.manualPoll.message),
+        ],
+        [
+          KeyboardButton(text: HubMessage.stats.message),
           KeyboardButton(text: HubMessage.mark.message),
         ],
         [
@@ -165,5 +171,15 @@ Future<void> _printBotConfigInfo(
       'Status: $pollRunningStatus\n'
       'Poll duration: $pollDuration\n'
       'Poll day of week: $pollDayOfWeek';
+  await message.reply(text);
+}
+
+Future<void> _printGamesStats(
+  TeleDart teledart,
+  TeleDartMessage message,
+) async {
+  final games = games_util.allBeerGames.toList();
+  final gamesStats = games.map((e) => '${e.log}\n').toList();
+  final text = "Name\nPlay Count,     Last Played\n\n${gamesStats.join('\n')}";
   await message.reply(text);
 }

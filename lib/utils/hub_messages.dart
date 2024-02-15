@@ -5,6 +5,8 @@ enum HubMessage {
   startAutoPoll._('Start Auto Poll'),
   killAutoPoll._('Kill Auto Poll'),
   mark._('Mark'),
+  stats._('Stats'),
+  deleteDB._('D3l3T3_DB'),
   ;
 
   const HubMessage._(this.message);

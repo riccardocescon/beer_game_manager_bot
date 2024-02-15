@@ -4,7 +4,7 @@ bool _markModeEnabled = false;
 TeleDartMessage? _markRequestMessage;
 Map<Game, bool> _markedGames = {};
 void _markHandler(TeleDart teledart, TeleDartMessage message) async {
-  final allGames = games_util.allGames.toList();
+  final allGames = games_util.allBeerGames.toList();
 
   _markedGames.clear();
   _markedGames.addEntries(allGames.map((e) => MapEntry(e, false)).toList());
@@ -82,9 +82,20 @@ void _handleMarkCallback(
         .map((e) => e.key.name)
         .join(', ');
 
-    // TODO: update play counted
+    final allGames = games_util.allBeerGames.toList();
+    final markedGamesList = allGames
+        .where((element) => _markedGames.entries
+            .firstWhere((e) => e.key.name == element.name)
+            .value)
+        .toList();
+    for (final currentGame in markedGamesList) {
+      currentGame.stats.playCount++;
+    }
 
-    await _markRequestMessage!.reply('Marked: $markedGames');
+    if (markedGamesList.isNotEmpty) {
+      BeerDatabase.instance.updateGames(markedGamesList);
+      await _markRequestMessage!.reply('Marked: $markedGames');
+    }
     teledart.deleteMessage(
       callback.message?.chat.id,
       callback.message!.messageId,
