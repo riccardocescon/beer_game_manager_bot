@@ -54,7 +54,7 @@ void _setPollDayOfWeek(TeleDart teleDart) async {
         [
           InlineKeyboardButton(
             text: 'Cancel',
-            callbackData: Commands.cancelConfig.value,
+            callbackData: ConfigCommands.cancelConfig.value,
           )
         ],
       ],

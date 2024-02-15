@@ -5,18 +5,22 @@ import 'package:beer_game_manager_bot/entities/bot.dart';
 import 'package:beer_game_manager_bot/entities/scheduled_poll.dart';
 import 'package:beer_game_manager_bot/utils/hub_messages.dart';
 import 'package:beer_game_manager_bot/utils/all_games.dart' as games_util;
-import 'package:beer_game_manager_bot/utils/commands.dart';
+import 'package:beer_game_manager_bot/utils/config_commands.dart';
 import 'package:beer_game_manager_bot/utils/date_time_utils.dart'
     as date_time_utils;
+import 'package:beer_game_manager_bot/utils/mark_commands.dart';
 import 'package:intl/intl.dart';
-import 'package:teledart/model.dart';
+import 'package:teledart/model.dart' hide Game;
 import 'package:teledart/teledart.dart';
+
+import 'entities/game.dart';
 
 part 'handlers/poll/poll_handler.dart';
 part 'handlers/poll/count_down_handler.dart';
 
 part 'handlers/config/config_handler.dart';
 part 'handlers/hub/hub_handler.dart';
+part 'handlers/mark/mark_handler.dart';
 part 'handlers/config/duration_config_handler.dart';
 part 'handlers/config/day_of_week_config_handler.dart';
 
@@ -37,11 +41,21 @@ Future<void> messageStreamer(TeleDart teledart) async {
         teledart.deleteMessage(message.chat.id, message.messageId);
         continue;
       }
+      if (_markModeEnabled) {
+        teledart.deleteMessage(message.chat.id, message.messageId);
+        continue;
+      }
+
       _handleConfigMessage(
         teledart,
         callbackData: null,
         message: message,
       );
+      continue;
+    }
+
+    if (_markModeEnabled) {
+      teledart.deleteMessage(message.chat.id, message.messageId);
       continue;
     }
 
@@ -53,10 +67,17 @@ Future<void> commandStreamer(TeleDart teledart) async {
   final messageStream = teledart.onCommand();
 
   await for (final message in messageStream) {
-    if (_configModeEnabled) return;
+    if (_configModeEnabled) {
+      teledart.deleteMessage(message.chat.id, message.messageId);
+      continue;
+    }
+    if (_markModeEnabled) {
+      teledart.deleteMessage(message.chat.id, message.messageId);
+      continue;
+    }
+
     print('Received command: ${message.text}');
     if (message.text == '/start') {
-      // _autoHandlePoll(teledart, message);
       _sendHubMessage(teledart, message);
       continue;
     }
@@ -90,6 +111,7 @@ void _sendHubMessage(TeleDart teleDart, TeleDartMessage message) {
       keyboard: [
         [
           KeyboardButton(text: HubMessage.manualPoll.message),
+          KeyboardButton(text: HubMessage.mark.message),
         ],
         [
           KeyboardButton(text: HubMessage.configInfo.message),
@@ -117,8 +139,14 @@ Future<void> callbackQueryStreamer(TeleDart teleDart) async {
       continue;
     }
 
+    if (_markModeEnabled) {
+      _handleMarkCallback(teleDart, callbackQuery);
+      continue;
+    }
+
     if (callbackQuery.data == 'info') {
       _updateRemainingPollTime(teleDart);
+      continue;
     }
   }
 }
