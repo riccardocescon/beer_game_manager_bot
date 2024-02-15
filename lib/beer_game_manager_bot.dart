@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:core';
 import 'package:beer_game_manager_bot/entities/bot.dart';
 import 'package:beer_game_manager_bot/entities/scheduled_poll.dart';
+import 'package:beer_game_manager_bot/utils/hub_messages.dart';
 import 'package:beer_game_manager_bot/utils/all_games.dart' as games_util;
 import 'package:beer_game_manager_bot/utils/commands.dart';
 import 'package:beer_game_manager_bot/utils/date_time_utils.dart'
@@ -15,6 +16,7 @@ part 'handlers/poll/poll_handler.dart';
 part 'handlers/poll/count_down_handler.dart';
 
 part 'handlers/config/config_handler.dart';
+part 'handlers/hub/hub_handler.dart';
 part 'handlers/config/duration_config_handler.dart';
 part 'handlers/config/day_of_week_config_handler.dart';
 
@@ -31,6 +33,10 @@ Future<void> messageStreamer(TeleDart teledart) async {
   await for (final message in messageStream) {
     print('Received message: ${message.text}');
     if (_configModeEnabled) {
+      if (HubMessage.values.any((element) => element.message == message.text)) {
+        teledart.deleteMessage(message.chat.id, message.messageId);
+        continue;
+      }
       _handleConfigMessage(
         teledart,
         callbackData: null,
@@ -38,6 +44,8 @@ Future<void> messageStreamer(TeleDart teledart) async {
       );
       continue;
     }
+
+    _handleHubMessage(teledart, message);
   }
 }
 
@@ -48,7 +56,8 @@ Future<void> commandStreamer(TeleDart teledart) async {
     if (_configModeEnabled) return;
     print('Received command: ${message.text}');
     if (message.text == '/start') {
-      _autoHandlePoll(teledart, message);
+      // _autoHandlePoll(teledart, message);
+      _sendHubMessage(teledart, message);
       continue;
     }
 
@@ -72,6 +81,27 @@ Future<void> commandStreamer(TeleDart teledart) async {
       continue;
     }
   }
+}
+
+void _sendHubMessage(TeleDart teleDart, TeleDartMessage message) {
+  message.reply(
+    'You\'re in the hub! What do you want to do?',
+    replyMarkup: ReplyKeyboardMarkup(
+      keyboard: [
+        [
+          KeyboardButton(text: HubMessage.manualPoll.message),
+        ],
+        [
+          KeyboardButton(text: HubMessage.configInfo.message),
+          KeyboardButton(text: HubMessage.editConfig.message),
+        ],
+        [
+          KeyboardButton(text: HubMessage.startAutoPoll.message),
+          KeyboardButton(text: HubMessage.killAutoPoll.message),
+        ],
+      ],
+    ),
+  );
 }
 
 Future<void> callbackQueryStreamer(TeleDart teleDart) async {
@@ -100,7 +130,11 @@ Future<void> _printBotConfigInfo(
   final config = Bot.instance.config;
   final pollDuration = config.formattedPollDuration;
   final pollDayOfWeek = config.dayOfWeekToStartPoll.name;
+  final pollRunningStatus = _currentPoll == null
+      ? 'No poll running'
+      : 'Poll running until ${DateFormat('dd/MM/yyyy - HH:mm').format(_currentPoll!.deadline)}';
   final text = 'Bot configuration:\n'
+      'Status: $pollRunningStatus\n'
       'Poll duration: $pollDuration\n'
       'Poll day of week: $pollDayOfWeek';
   await message.reply(text);

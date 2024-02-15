@@ -78,7 +78,7 @@ void _killPoll(TeleDart teledart, TeleDartMessage message) {
   _killTimer();
   _currentPoll = null;
   message.reply(
-    'Auto Poll Killed.\n You can now start a poll manually with \'/manage\' or restart the auto poll with \'/start\' command',
+    'Auto Poll Killed.\n Use the Hub messages to start a new poll',
   );
 }
 
