@@ -15,6 +15,7 @@ import 'package:teledart/model.dart' hide Game;
 import 'package:teledart/teledart.dart';
 
 import 'entities/game.dart';
+import 'utils/game_sorter.dart' as game_sorter;
 
 part 'handlers/poll/poll_handler.dart';
 part 'handlers/poll/count_down_handler.dart';

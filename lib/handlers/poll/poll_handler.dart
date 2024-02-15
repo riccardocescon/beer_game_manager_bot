@@ -164,14 +164,16 @@ Future<void> _handleCompletedPoll(
   final games = games_util.gamesForPlayers(players);
 
   if (games.isEmpty) {
-    message.reply('Nessun gioco trovato per $players giocatori');
+    message.reply('No game found for $players players');
     return;
   }
+
+  final sortedGames = game_sorter.sortGamesByPlayCount(games, true);
 
   message.reply(
     'Poll ended with $players players\n'
     'Here\'s a list of games suitable for $players players:\n\n'
-    '- ${games.map((e) => e.name).join('\n')}',
+    '- ${sortedGames.map((e) => e.log).join('\n\n')}',
   );
 }
 //#endregion

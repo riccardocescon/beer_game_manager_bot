@@ -18,7 +18,7 @@ class Game with EquatableMixin {
   List<Object?> get props => [name, minPlayers, maxPlayers, onlyMinMaxPlayers];
 }
 
-class BeerGame extends Game {
+class BeerGame extends Game with EquatableMixin {
   GameStats stats;
 
   String get log {
@@ -56,9 +56,13 @@ class BeerGame extends Game {
   }
 
   String toFile() => '$name,${stats.toFile()}';
+
+  @override
+  List<Object?> get props =>
+      [name, minPlayers, maxPlayers, onlyMinMaxPlayers, stats];
 }
 
-class GameStats {
+class GameStats with EquatableMixin {
   int playCount;
   DateTime lastPlayed;
 
@@ -76,4 +80,7 @@ class GameStats {
   }
 
   String toFile() => '$playCount,${lastPlayed.toIso8601String()}';
+
+  @override
+  List<Object?> get props => [playCount, lastPlayed];
 }
