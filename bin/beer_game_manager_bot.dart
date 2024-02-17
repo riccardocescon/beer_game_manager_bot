@@ -1,5 +1,6 @@
 import 'package:beer_game_manager_bot/beer_game_manager_bot.dart'
     as beer_game_manager_bot;
+import 'package:beer_game_manager_bot/entities/bot.dart' as bot;
 import 'package:dotenv/dotenv.dart';
 import 'package:teledart/teledart.dart';
 import 'package:teledart/telegram.dart';
@@ -9,6 +10,8 @@ void main(List<String> arguments) async {
   try {
     db.BeerDatabase.instance
         .setup(dbVersion: db.BeerDatabase.instance.dbVersion);
+
+    bot.Bot.setup();
 
     var env = DotEnv(includePlatformEnvironment: true)..load();
     final botToken = env['BOT_TOKEN']!;

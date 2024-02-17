@@ -1,12 +1,13 @@
 import 'dart:io';
 import 'package:beer_game_manager_bot/entities/game.dart';
 import 'package:beer_game_manager_bot/utils/all_games.dart' as all_games;
+import 'package:beer_game_manager_bot/utils/paths.dart' as path_utils;
 
 class BeerDatabase {
   static final BeerDatabase instance = BeerDatabase._internal();
   BeerDatabase._internal();
 
-  final _dbFile = File('beer_game_manager.db');
+  final _dbFile = File(path_utils.Paths.db);
 
   final dbVersion = 0;
 

@@ -114,6 +114,8 @@ void _exitConfigMode(TeleDart teleDart) {
   _inlineMessage = null;
   _configModeEnabled = false;
 
+  Bot.instance.updateConfigFile();
+
   // Restart the auto handle poll
   // with the new configuration
   _restartAutoHandlePoll();

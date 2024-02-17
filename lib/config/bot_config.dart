@@ -1,10 +1,11 @@
+import 'dart:convert';
+
 import 'package:beer_game_manager_bot/utils/date_time_utils.dart'
     as date_time_utils;
 
 class BotConfig {
-  Duration _pollDuration = Duration(seconds: 10);
-  date_time_utils.DaysOfWeek _dayOfWeekToStartPoll =
-      date_time_utils.DaysOfWeek.monday;
+  late Duration _pollDuration;
+  late date_time_utils.DaysOfWeek _dayOfWeekToStartPoll;
 
   String get formattedPollDuration {
     final hours =
@@ -26,5 +27,36 @@ class BotConfig {
 
   set dayOfWeekToStartPoll(date_time_utils.DaysOfWeek value) {
     _dayOfWeekToStartPoll = value;
+  }
+
+  BotConfig._({
+    required Duration duration,
+    required date_time_utils.DaysOfWeek dayOfWeek,
+  })  : _pollDuration = duration,
+        _dayOfWeekToStartPoll = dayOfWeek;
+
+  factory BotConfig.fromFile(String jsonContent) {
+    final data = jsonDecode(jsonContent);
+    final duration = Duration(seconds: data['pollDuration']);
+    final dayOfWeek =
+        date_time_utils.DaysOfWeek.values[data['dayOfWeekToStartPoll']];
+
+    return BotConfig._(duration: duration, dayOfWeek: dayOfWeek);
+  }
+
+  factory BotConfig.defaultConfig() {
+    return BotConfig._(
+      duration: Duration(days: 1),
+      dayOfWeek: date_time_utils.DaysOfWeek.monday,
+    );
+  }
+
+  String toFile() {
+    final data = {
+      'pollDuration': _pollDuration.inSeconds,
+      'dayOfWeekToStartPoll': _dayOfWeekToStartPoll.index,
+    };
+
+    return jsonEncode(data);
   }
 }
