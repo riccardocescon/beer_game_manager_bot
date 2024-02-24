@@ -37,7 +37,8 @@ void _autoHandlePoll(TeleDart teledart, TeleDartMessage message) async {
     final now = DateTime.now();
     final weekDayToStartPoll = Bot.instance.config.dayOfWeekToStartPoll.value;
     final currentWeekDay = now.weekday;
-    final remainingDays = (currentWeekDay + weekDayToStartPoll) % 7;
+    int remainingDays = weekDayToStartPoll - currentWeekDay;
+    if (remainingDays < 0) remainingDays += 7;
     final nowLaunch = now.copyWith(
       hour: 12,
       minute: 0,
